@@ -19,6 +19,8 @@ sampleApp.controller('MapCtrl', function ($scope) {
     init($scope);
     marker($scope);
     clickListner($scope);
+    createSearchBox($scope);
+    createSearchBoxFinal($scope);
     /* $scope.resetCoordinates = function(){
      latLongInitial={};
      latLongFinal={};
@@ -48,7 +50,7 @@ function init($scope){
     var mapOptions = {
         zoom: 15,
         center: new google.maps.LatLng(cities[0].lat,cities[0].long),
-        mapTypeId: google.maps.MapTypeId.NORMAL
+        mapTypeId: google.maps.MapTypeId.roadmap
     }
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
 }
@@ -84,6 +86,7 @@ function calculateAndDisplayRoute($scope) {
             window.alert('Directions request failed due to ' + status);
         }
     });
+    resetCoordinates();
 }
 
 function isEmpty(obj) {
@@ -103,6 +106,75 @@ function isEmpty(obj) {
     } else {
         console.error("isEmpty function only accept an Object");
     }
+}
+
+function createSearchBox($scope) {
+    // Create the search box and link it to the UI element.
+    var input = document.getElementById('searchBox');
+    $scope.searchBox = new google.maps.places.SearchBox(input);
+    $scope.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    // Bias the SearchBox results towards current map's viewport.
+    $scope.map.addListener('bounds_changed', function () {
+        $scope.searchBox.setBounds($scope.map.getBounds());
+    });
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
+    $scope.searchBox.addListener('places_changed', function () {
+        var places = $scope.searchBox.getPlaces();
+
+        if (places.length == 0) {
+            return;
+        }
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function (place) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+            resetCoordinates();
+            latLongInitial['lat'] = place.geometry.location.lat().toFixed(4);
+            latLongInitial['long'] = place.geometry.location.lng().toFixed(4);
+            if (!isEmpty(latLongInitial) && !isEmpty(latLongFinal)) {
+                calculateAndDisplayRoute($scope);
+            }
+        });
+        $scope.map.fitBounds(bounds);
+
+    });
+}
+
+function createSearchBoxFinal($scope){
+    // Create the search box and link it to the UI element.
+    var input = document.getElementById('searchBoxFinal');
+    $scope.searchBoxFinal = new google.maps.places.SearchBox(input);
+    $scope.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+    // Bias the SearchBox results towards current map's viewport.
+    $scope.map.addListener('bounds_changed', function () {
+        $scope.searchBoxFinal.setBounds($scope.map.getBounds());
+    });
+    // Listen for the event fired when the user selects a prediction and retrieve
+    // more details for that place.
+    $scope.searchBoxFinal.addListener('places_changed', function () {
+        var places = $scope.searchBoxFinal.getPlaces();
+
+        if (places.length == 0) {
+            return;
+        }
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function (place) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+            latLongFinal['lat'] = place.geometry.location.lat().toFixed(4);
+            latLongFinal['long'] = place.geometry.location.lng().toFixed(4);
+            if (!isEmpty(latLongInitial) && !isEmpty(latLongFinal)) {
+                calculateAndDisplayRoute($scope);
+            }
+        });
+        $scope.map.fitBounds(bounds);
+
+    });
 }
 
 
