@@ -131,7 +131,6 @@ function createSearchBox($scope) {
                 console.log("Returned place contains no geometry");
                 return;
             }
-            resetCoordinates();
             latLongInitial['lat'] = place.geometry.location.lat().toFixed(4);
             latLongInitial['long'] = place.geometry.location.lng().toFixed(4);
             if (!isEmpty(latLongInitial) && !isEmpty(latLongFinal)) {
