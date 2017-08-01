@@ -11,13 +11,15 @@
     <meta charset="ISO-8859-1">
     <title>Angular Maps</title>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCA0CgkLL5G0TjxG7teWgh1F-MNjkOXmVo&sensor=false&language=en"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCA0CgkLL5G0TjxG7teWgh1F-MNjkOXmVo&libraries=places&language=en"></script>
     <asset:stylesheet src="AngularMaps.css"></asset:stylesheet>
     <asset:javascript src="AngularMaps.js"></asset:javascript>
 </head>
 <body>
 <div ng-controller="MapCtrl">
     %{--<input type="button" value="Refresh Coordinates"  ng-click="resetCoordinates();">--}%
+    <input id="searchBox"  type="text" placeholder="Search Box Initial">
+    <input id="searchBoxFinal"  type="text" placeholder="Search Box final">
     <div id="map" style="width: 1000px;height: 1000px"></div>
 </div>
 </body>
