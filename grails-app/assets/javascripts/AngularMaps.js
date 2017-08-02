@@ -114,9 +114,9 @@ function createSearchBox($scope) {
     $scope.searchBox = new google.maps.places.SearchBox(input);
     $scope.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
     // Bias the SearchBox results towards current map's viewport.
-    $scope.map.addListener('bounds_changed', function () {
+  /*  $scope.map.addListener('bounds_changed', function () {
         $scope.searchBox.setBounds($scope.map.getBounds());
-    });
+    });*/
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     $scope.searchBox.addListener('places_changed', function () {
@@ -137,7 +137,7 @@ function createSearchBox($scope) {
                 calculateAndDisplayRoute($scope);
             }
         });
-        $scope.map.fitBounds(bounds);
+        // $scope.map.fitBounds(bounds);
 
     });
 }
@@ -148,9 +148,9 @@ function createSearchBoxFinal($scope){
     $scope.searchBoxFinal = new google.maps.places.SearchBox(input);
     $scope.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
     // Bias the SearchBox results towards current map's viewport.
-    $scope.map.addListener('bounds_changed', function () {
+ /*   $scope.map.addListener('bounds_changed', function () {
         $scope.searchBoxFinal.setBounds($scope.map.getBounds());
-    });
+    });*/
     // Listen for the event fired when the user selects a prediction and retrieve
     // more details for that place.
     $scope.searchBoxFinal.addListener('places_changed', function () {
@@ -171,7 +171,7 @@ function createSearchBoxFinal($scope){
                 calculateAndDisplayRoute($scope);
             }
         });
-        $scope.map.fitBounds(bounds);
+        // $scope.map.fitBounds(bounds);
 
     });
 }
