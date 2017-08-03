@@ -196,16 +196,16 @@ function distanceMatrix($scope){
             alert('Error was: ' + status);
         } else {
             var originList = response.originAddresses;
-            for (var i = 0; i < originList.length; i++) {
-                var results = response.rows[i].elements;
+                var results = response.rows[0].elements;
                 for (var j = 0; j < results.length; j++) {
                     infoWindow.setContent("Distance "+results[j].distance.text + "<br>" + "Duration "+results[j].duration.text + " ");
-                   console.log("************"+originList[j])
                     //dont know why set position is not working
-                    infoWindow.setPosition(new google.maps.LatLng(latLongInitial['lat'], latLongInitial['lng']));
+                    // infoWindow.setPosition(new google.maps.LatLng(latLongInitial['lat'], latLongInitial['lng']));
+                    /*infoWindow.setPosition({
+                        lat:39.2511,
+                    lng:81.3271});*/
                     infoWindow.open($scope.map);
                 }
-            }
         }
     });
 }
