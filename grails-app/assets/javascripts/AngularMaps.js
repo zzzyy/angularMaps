@@ -15,6 +15,10 @@ var sampleApp = angular.module('mapsApp', []);
 var clicks = 0;
 var directionsService = new google.maps.DirectionsService;
 var directionsDisplay = new google.maps.DirectionsRenderer;
+var service = new google.maps.DistanceMatrixService;
+var geocoder = new google.maps.Geocoder;
+var infoWindow = new google.maps.InfoWindow();
+
 sampleApp.controller('MapCtrl', function ($scope) {
     init($scope);
     marker($scope);
@@ -31,18 +35,18 @@ function clickListner($scope) {
         if (clicks == 0){
             resetCoordinates();
             latLongInitial['lat'] = event.latLng.lat().toFixed(4);
-            latLongInitial['long'] = event.latLng.lng().toFixed(4);
+            latLongInitial['lng'] = event.latLng.lng().toFixed(4);
             clicks++;
         } else{
             latLongFinal['lat'] = event.latLng.lat().toFixed(4);
-            latLongFinal['long'] = event.latLng.lng().toFixed(4);
+            latLongFinal['lng'] = event.latLng.lng().toFixed(4);
             clicks=0;
         }
         if(!isEmpty(latLongInitial) && !isEmpty(latLongFinal)){
             calculateAndDisplayRoute($scope);
         }
 
-        // latLong['long']
+        // latLong['lng']
         // console.log(event.latLng.lat().toFixed(4)+"     "+ event.latLng.lng().toFixed(4));
     });
 }
@@ -61,7 +65,6 @@ function marker($scope){
         title: cities[0].city
     });
     marker.content = '<div class="infoWindowContent">' + cities[0].desc + '</div>';
-    var infoWindow = new google.maps.InfoWindow();
     // directionsDisplay.setMap($scope.map);
     google.maps.event.addListener(marker, 'click', function(){
         infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
@@ -76,9 +79,10 @@ function resetCoordinates(){
 function calculateAndDisplayRoute($scope) {
     directionsDisplay.setMap($scope.map);
     directionsService.route({
-        origin: latLongInitial['lat']+','+latLongInitial['long'],
-        destination: latLongFinal['lat']+','+latLongFinal['long'],
-        travelMode: 'DRIVING'
+        origin: latLongInitial['lat']+','+latLongInitial['lng'],
+        destination: latLongFinal['lat']+','+latLongFinal['lng'],
+        travelMode: 'DRIVING',
+        provideRouteAlternatives: true
     }, function(response, status) {
         if (status === 'OK') {
             directionsDisplay.setDirections(response);
@@ -86,6 +90,7 @@ function calculateAndDisplayRoute($scope) {
             window.alert('Directions request failed due to ' + status);
         }
     });
+    distanceMatrix($scope);
     resetCoordinates();
 }
 
@@ -132,7 +137,7 @@ function createSearchBox($scope) {
                 return;
             }
             latLongInitial['lat'] = place.geometry.location.lat().toFixed(4);
-            latLongInitial['long'] = place.geometry.location.lng().toFixed(4);
+            latLongInitial['lng'] = place.geometry.location.lng().toFixed(4);
             if (!isEmpty(latLongInitial) && !isEmpty(latLongFinal)) {
                 calculateAndDisplayRoute($scope);
             }
@@ -166,7 +171,7 @@ function createSearchBoxFinal($scope){
                 return;
             }
             latLongFinal['lat'] = place.geometry.location.lat().toFixed(4);
-            latLongFinal['long'] = place.geometry.location.lng().toFixed(4);
+            latLongFinal['lng'] = place.geometry.location.lng().toFixed(4);
             if (!isEmpty(latLongInitial) && !isEmpty(latLongFinal)) {
                 calculateAndDisplayRoute($scope);
             }
@@ -175,5 +180,37 @@ function createSearchBoxFinal($scope){
 
     });
 }
+
+function distanceMatrix($scope){
+    console.log(latLongInitial);
+    service.getDistanceMatrix({
+        origins: [latLongInitial['lat']+','+latLongInitial['lng']],
+        destinations: [latLongFinal['lat']+','+latLongFinal['lng']],
+        travelMode: 'DRIVING',
+        unitSystem: google.maps.UnitSystem.METRIC,
+        avoidHighways: false,
+        avoidTolls: false
+    }, function(response, status) {
+        console.log("*************'''"+response)
+        if (status !== 'OK') {
+            alert('Error was: ' + status);
+        } else {
+            var originList = response.originAddresses;
+            for (var i = 0; i < originList.length; i++) {
+                var results = response.rows[i].elements;
+                for (var j = 0; j < results.length; j++) {
+                    infoWindow.setContent("Distance "+results[j].distance.text + "<br>" + "Duration "+results[j].duration.text + " ");
+                   console.log("************"+originList[j])
+                    //dont know why set position is not working
+                    infoWindow.setPosition(new google.maps.LatLng(latLongInitial['lat'], latLongInitial['lng']));
+                    infoWindow.open($scope.map);
+                }
+            }
+        }
+    });
+}
+
+
+
 
 
